@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media URL Input</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .media-input, .copywriting-input {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .delete-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            cursor: pointer;
+            color: red;
+        }
+        .add-btn {
+            margin-top: 10px;
+        }
+        .submit-btn {
+            margin-top: 20px;
+        }
+        .generated-files {
+            margin-top: 30px;
+        }
+        .copy-btn {
+            margin-left: 10px;
+        }
+        .generated-files h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .list-group-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .copy-btn {
+            cursor: pointer;
+        }
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            min-width: 200px;
+            z-index: 1050;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">Media and Copywriting Input</h1>
+        <form method="POST">
+            <div class="form-group">
+                <label for="title">Main Title:</label>
+                <input type="text" id="title" name="title" class="form-control" required>
+            </div>
+            <div id="media-inputs">
+                <div class="media-input form-group row">
+                    <div class="col-md-6">
+                        <label for="media_url">Media URL:</label>
+                        <input type="text" name="media_url" class="form-control" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="media_type">Type:</label>
+                        <select name="media_type" class="form-control">
+                            <option value="video">Video</option>
+                            <option value="image">Image</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="poster_url">Poster URL (for videos):</label>
+                        <input type="text" name="poster_url" class="form-control">
+                    </div>
+                    <span class="delete-btn" onclick="removeInput(this)">&times;</span>
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary add-btn" onclick="addMediaInput()"><i class="fas fa-plus"></i> Add Another Media</button>
+            
+            <div id="copywriting-inputs">
+                <div class="copywriting-input form-group">
+                    <label for="copywriting_text">Copywriting Text:</label>
+                    <textarea name="copywriting_text" class="form-control" rows="3"></textarea>
+                    <span class="delete-btn" onclick="removeInput(this)">&times;</span>
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary add-btn" onclick="addCopywritingInput()"><i class="fas fa-plus"></i> Add Another Copywriting</button>
+            
+            <button type="submit" class="btn btn-primary submit-btn"><i class="fas fa-check"></i> Generate HTML and Zip</button>
+        </form>
+
+        {% if generated_html_files %}
+        <div class="generated-files">
+            <h2>Generated HTML Files</h2>
+            <ul class="list-group">
+                {% for item in generated_html_files %}
+                <li class="list-group-item">
+                    <a href="{{ url_for('download_file', filename=item.file) }}" target="_blank">{{ item.file }}</a>
+                    <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyToClipboard({{ loop.index0 }})"><i class="fas fa-copy"></i> Copy HTML</button>
+                    <textarea id="htmlContent{{ loop.index0 }}" style="display:none;">{{ item.content }}</textarea>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script>
+        function addMediaInput() {
+            var mediaInputs = document.getElementById('media-inputs');
+            var newInput = document.createElement('div');
+            newInput.classList.add('media-input', 'form-group', 'row');
+            newInput.innerHTML = `
+                <div class="col-md-6">
+                    <label for="media_url">Media URL:</label>
+                    <input type="text" name="media_url" class="form-control" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="media_type">Type:</label>
+                    <select name="media_type" class="form-control">
+                        <option value="video">Video</option>
+                        <option value="image">Image</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="poster_url">Poster URL (for videos):</label>
+                    <input type="text" name="poster_url" class="form-control">
+                </div>
+                <span class="delete-btn" onclick="removeInput(this)">&times;</span>
+            `;
+            mediaInputs.appendChild(newInput);
+        }
+
+        function addCopywritingInput() {
+            var copywritingInputs = document.getElementById('copywriting-inputs');
+            var newInput = document.createElement('div');
+            newInput.classList.add('copywriting-input', 'form-group');
+            newInput.innerHTML = `
+                <label for="copywriting_text">Copywriting Text:</label>
+                <textarea name="copywriting_text" class="form-control" rows="3"></textarea>
+                <span class="delete-btn" onclick="removeInput(this)">&times;</span>
+            `;
+            copywritingInputs.appendChild(newInput);
+        }
+
+        function removeInput(element) {
+            element.parentElement.remove();
+        }
+
+        function copyToClipboard(index) {
+            var content = document.getElementById('htmlContent' + index).value;
+            navigator.clipboard.writeText(content).then(function() {
+                showToast('Copied!');
+            }, function(err) {
+                alert('Failed to copy text: ' + err);
+            });
+        }
+
+        function showToast(message) {
+            var toastContainer = document.getElementById('toastContainer');
+            var toast = document.createElement('div');
+            toast.classList.add('toast', 'show', 'bg-success', 'text-white');
+            toast.innerHTML = `
+                <div class="toast-body">
+                    ${message}
+                </div>
+            `;
+            toastContainer.appendChild(toast);
+            setTimeout(function() {
+                toast.classList.remove('show');
+                toastContainer.removeChild(toast);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

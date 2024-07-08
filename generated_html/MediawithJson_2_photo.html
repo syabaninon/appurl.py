@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Embed, Preview, and Download Image</title>
+            <style>
+                .media-container {
+                    text-align: center;
+                    margin: 20px;
+                }
+                .download-link {
+                    margin-top: 10px;
+                    display: inline-block;
+                    padding: 10px 20px;
+                    background-color: #4CAF50;
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 5px;
+                }
+                .media-wrapper {
+                    position: relative;
+                    width: 100%;
+                    max-width: 560px;
+                    margin: 0 auto;
+                }
+                img {
+                    width: 100%;
+                    height: auto;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="media-container">
+                <div class="media-wrapper">
+                    <img id="mediaElement" src="https://down-my.img.susercontent.com/file/cn-11134207-7r98o-lkuclwbzgfsh9b" alt="Image Preview">
+                </div>
+                <br>
+                <a href="https://down-my.img.susercontent.com/file/cn-11134207-7r98o-lkuclwbzgfsh9b" class="download-link" id="downloadLink" download="MediawithJson_2_photo.jpg">Download Media-2 (Image)</a>
+            </div>
+            <script>
+                document.getElementById('downloadLink').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var url = this.href;
+                    var fileName = 'MediawithJson_2_photo.jpg'; // Custom file name
+
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', url, true);
+                    xhr.responseType = 'blob';
+                    xhr.onload = function() {
+                        if (xhr.status === 200) {
+                            var blob = xhr.response;
+                            var a = document.createElement('a');
+                            a.href = window.URL.createObjectURL(blob);
+                            a.download = fileName;
+                            a.style.display = 'none';
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                        }
+                    };
+                    xhr.send();
+                });
+            </script>
+        </body>
+        </html>
+        

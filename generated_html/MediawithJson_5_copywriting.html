@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Copywriting Text 5</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 100vh;
+                    background-color: #f4f4f4;
+                }
+                #container {
+                    width: 100%;
+                    max-width: 600px;
+                    height: auto;
+                    padding: 20px;
+                    background: white;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    border-radius: 10px;
+                    text-align: center;
+                }
+                #textToCopy {
+                    width: 100%;
+                    padding: 10px;
+                    overflow: hidden; /* Hide scroll bar */
+                    resize: none; /* Prevent resizing */
+                    border: 1px solid #ccc;
+                    border-radius: 5px;
+                    margin-bottom: 10px;
+                    box-sizing: border-box;
+                    height: auto;
+                }
+                #copyButton {
+                    padding: 10px 20px;
+                    cursor: pointer;
+                    background-color: #4CAF50;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    margin-top: 10px;
+                    font-size: 16px;
+                }
+                #notification {
+                    display: none;
+                    margin-top: 10px;
+                    padding: 10px;
+                    background-color: #4CAF50;
+                    color: white;
+                    border-radius: 5px;
+                    position: fixed;
+                    top: 10%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    z-index: 1000;
+                }
+                @media (max-width: 600px) {
+                    #container {
+                        width: 100%;
+                        margin: 10px;
+                        padding: 10px;
+                    }
+                    #copyButton {
+                        padding: 10px;
+                        font-size: 14px;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+
+        <div id="container">
+            <textarea id="textToCopy" rows="10" cols="50">saya nak kongsi pasal nie lipstick, saya try beli 2 kode sahaja kode 01 dan 03, perghhh dya ringan sangat n bau dya wangi bila kau pakaii ringan je d mulut. memang saya lovee gilaaa nnti saya repeat order balik, I love it. about penghantaran n packaging okay jaaa , saya sukaaa barang smpai pun okayy i love made in chinaaa .</textarea>
+            <button id="copyButton">Copy to Clipboard</button>
+            <div id="notification">Copied!</div>
+        </div>
+
+        <script>
+            function adjustTextareaHeight() {
+                const textarea = document.getElementById('textToCopy');
+                textarea.style.height = 'auto'; // Reset the height to auto
+                textarea.style.height = textarea.scrollHeight + 'px'; // Set the height to the scrollHeight
+            }
+
+            document.getElementById('copyButton').addEventListener('click', function() {
+                const textToCopy = document.getElementById('textToCopy');
+                textToCopy.select();
+                textToCopy.setSelectionRange(0, 99999); // For mobile devices
+                document.execCommand('copy');
+
+                const notification = document.getElementById('notification');
+                notification.style.display = 'block';
+                setTimeout(function() {
+                    notification.style.display = 'none';
+                }, 2000);
+            });
+
+            // Adjust textarea height on page load
+            window.addEventListener('load', adjustTextareaHeight);
+            // Adjust textarea height when window is resized
+            window.addEventListener('resize', adjustTextareaHeight);
+            // Adjust textarea height when content is inputted
+            document.getElementById('textToCopy').addEventListener('input', adjustTextareaHeight);
+        </script>
+
+        </body>
+        </html>
+        
